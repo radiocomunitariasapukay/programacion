@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Sapukay - Programación del Día</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        body {
+            background-color: transparent;
+            color: #ffffff;
+            padding: 12px;
+            width: 420px;
+            overflow: hidden;
+        }
+
+        .card {
+            background: rgba(30, 35, 45, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .station-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ff9800;
+            letter-spacing: 0.5px;
+        }
+
+        .day-title {
+            font-size: 12px;
+            color: #a0aabe;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .program-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .program-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 8px 12px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .program-time {
+            font-size: 13px;
+            font-weight: 600;
+            color: #cccccc;
+            min-width: 55px;
+        }
+
+        .program-name {
+            font-size: 14px;
+            font-weight: 600;
+            flex-grow: 1;
+            margin-left: 10px;
+            color: #ffffff;
+        }
+
+        /* Estilo destacado para el programa EN VIVO */
+        .program-item.active {
+            background: rgba(255, 152, 0, 0.2);
+            border: 1px solid rgba(255, 152, 0, 0.6);
+            box-shadow: 0 0 12px rgba(255, 152, 0, 0.2);
+        }
+
+        .program-item.active .program-time {
+            color: #ffb74d;
+        }
+
+        .program-item.active .program-name {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .badge-live {
+            display: none;
+            background: #e53935;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .program-item.active .badge-live {
+            display: inline-block;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .footer-info {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 11px;
+            color: #8899a6;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="header">
+            <div class="title-group">
+                <span>📻</span>
+                <span class="station-name">SAPUKAY 90.9</span>
+            </div>
+            <div class="day-title" id="day-name">PROGRAMACIÓN</div>
+        </div>
+
+        <div class="program-list" id="program-list">
+            <!-- Se carga dinámicamente -->
+        </div>
+
+        <div class="footer-info">
+            Gente como vos, haciendo radio.
+        </div>
+    </div>
+
+    <script>
+        const schedule = {
+            1: { // Lunes
+                dayName: "Lunes",
+                programs: [
+                    { time: "06:30", start: 6.5, end: 9.0, name: "Cara y Ceca" },
+                    { time: "09:00", start: 9.0, end: 12.5, name: "El Informador Comunitario" },
+                    { time: "12:30", start: 12.5, end: 14.5, name: "Informativo FARCO" },
+                    { time: "14:30", start: 14.5, end: 24.0, name: "Soplo de Vida" }
+                ]
+            },
+            2: { // Martes
+                dayName: "Martes",
+                programs: [
+                    { time: "06:30", start: 6.5, end: 9.0, name: "Cara y Ceca" },
+                    { time: "09:00", start: 9.0, end: 12.5, name: "El Informador Comunitario" },
+                    { time: "12:30", start: 12.5, end: 16.0, name: "Informativo FARCO" },
+                    { time: "16:00", start: 16.0, end: 24.0, name: "Manos de Mujeres" }
+                ]
+            },
+            3: { // Miércoles
+                dayName: "Miércoles",
+                programs: [
+                    { time: "06:30", start: 6.5, end: 9.0, name: "Cara y Ceca" },
+                    { time: "09:00", start: 9.0, end: 12.5, name: "El Informador Comunitario" },
+                    { time: "12:30", start: 12.5, end: 17.25, name: "Informativo FARCO" },
+                    { time: "17:15", start: 17.25, end: 19.0, name: "Aquí voy para Entre Ríos" },
+                    { time: "19:00", start: 19.0, end: 20.0, name: "El Pero del Falo" },
+                    { time: "20:00", start: 20.0, end: 24.0, name: "Los Negros de Miércoles" }
+                ]
+            },
+            4: { // Jueves
+                dayName: "Jueves",
+                programs: [
+                    { time: "06:30", start: 6.5, end: 9.0, name: "Cara y Ceca" },
+                    { time: "09:00", start: 9.0, end: 12.5, name: "El Informador Comunitario" },
+                    { time: "12:30", start: 12.5, end: 18.0, name: "Informativo FARCO" },
+                    { time: "18:00", start: 18.0, end: 24.0, name: "La Otredad" }
+                ]
+            },
+            5: { // Viernes
+                dayName: "Viernes",
+                programs: [
+                    { time: "06:30", start: 6.5, end: 9.0, name: "Cara y Ceca" },
+                    { time: "09:00", start: 9.0, end: 14.0, name: "El Informador Comunitario" },
+                    { time: "14:00", start: 14.0, end: 18.5, name: "Reporte Semanal" },
+                    { time: "18:30", start: 18.5, end: 20.0, name: "Crece desde el pie" },
+                    { time: "20:00", start: 20.0, end: 22.0, name: "Un mismo río" },
+                    { time: "22:00", start: 22.0, end: 24.0, name: "Reggae One Blood" }
+                ]
+            }
+        };
+
+        function updateSchedule() {
+            const now = new Date();
+            // Obtener el día de la semana (1 = Lunes, ..., 5 = Viernes)
+            let day = now.getDay();
+            
+            // Si es fin de semana (Sábado = 6, Domingo = 0), mostramos por defecto la de Lunes
+            if (day === 0 || day === 6) day = 1;
+
+            const currentHour = now.getHours() + (now.getMinutes() / 60);
+            const todayData = schedule[day];
+
+            document.getElementById('day-name').innerText = `PROGRAMACIÓN (${todayData.dayName})`;
+
+            const container = document.getElementById('program-list');
+            container.innerHTML = '';
+
+            todayData.programs.forEach(prog => {
+                const isLive = currentHour >= prog.start && currentHour < prog.end;
+                
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `program-item ${isLive ? 'active' : ''}`;
+                
+                itemDiv.innerHTML = `
+                    <span class="program-time">${prog.time}</span>
+                    <span class="program-name">${prog.name}</span>
+                    <span class="badge-live">EN VIVO</span>
+                `;
+
+                container.appendChild(itemDiv);
+            });
+        }
+
+        updateSchedule();
+        // Actualiza el estado de "En Vivo" cada minuto
+        setInterval(updateSchedule, 60000);
+    </script>
+</body>
+</html>
