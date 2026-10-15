@@ -17,9 +17,10 @@
         body {
             background-color: transparent;
             color: #ffffff;
-            padding: 12px;
-            width: 420px;
-            overflow: hidden;
+            padding: 8px;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
         }
 
         .card {
@@ -30,6 +31,7 @@
             border-radius: 18px;
             padding: 16px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            width: 100%;
         }
 
         .header {
@@ -168,7 +170,7 @@
                 programs: [
                     { time: "06:30", start: 6.5, end: 9.0, name: "Cara y Ceca" },
                     { time: "09:00", start: 9.0, end: 12.5, name: "El Informador Comunitario" },
-                    { time: "12:30", start: 12.5, end: 14.5, name: "Informativo FARCO" },
+                    { time: "12:30", start: 12.5, end: 12.75, name: "Informativo FARCO" },
                     { time: "14:30", start: 14.5, end: 24.0, name: "Soplo de Vida" }
                 ]
             },
@@ -177,7 +179,7 @@
                 programs: [
                     { time: "06:30", start: 6.5, end: 9.0, name: "Cara y Ceca" },
                     { time: "09:00", start: 9.0, end: 12.5, name: "El Informador Comunitario" },
-                    { time: "12:30", start: 12.5, end: 16.0, name: "Informativo FARCO" },
+                    { time: "12:30", start: 12.5, end: 12.75, name: "Informativo FARCO" },
                     { time: "16:00", start: 16.0, end: 24.0, name: "Manos de Mujeres" }
                 ]
             },
@@ -186,19 +188,18 @@
                 programs: [
                     { time: "06:30", start: 6.5, end: 9.0, name: "Cara y Ceca" },
                     { time: "09:00", start: 9.0, end: 12.5, name: "El Informador Comunitario" },
-                    { time: "12:30", start: 12.5, end: 17.25, name: "Informativo FARCO" },
+                    { time: "12:30", start: 12.5, end: 12.75, name: "Informativo FARCO" },
                     { time: "17:15", start: 17.25, end: 19.0, name: "Aquí voy para Entre Ríos" },
                     { time: "19:00", start: 19.0, end: 20.0, name: "El Pero del Falo" },
                     { time: "20:00", start: 20.0, end: 24.0, name: "Los Negros de Miércoles" }
                 ]
             },
-            4: { // Jueves
+            4: { // Jueves (Sin La Otredad, Informativo FARCO a su hora correcta)
                 dayName: "Jueves",
                 programs: [
                     { time: "06:30", start: 6.5, end: 9.0, name: "Cara y Ceca" },
                     { time: "09:00", start: 9.0, end: 12.5, name: "El Informador Comunitario" },
-                    { time: "12:30", start: 12.5, end: 18.0, name: "Informativo FARCO" },
-                    { time: "18:00", start: 18.0, end: 24.0, name: "La Otredad" }
+                    { time: "12:30", start: 12.5, end: 12.75, name: "Informativo FARCO" }
                 ]
             },
             5: { // Viernes
@@ -216,10 +217,8 @@
 
         function updateSchedule() {
             const now = new Date();
-            // Obtener el día de la semana (1 = Lunes, ..., 5 = Viernes)
             let day = now.getDay();
             
-            // Si es fin de semana (Sábado = 6, Domingo = 0), mostramos por defecto la de Lunes
             if (day === 0 || day === 6) day = 1;
 
             const currentHour = now.getHours() + (now.getMinutes() / 60);
@@ -247,7 +246,6 @@
         }
 
         updateSchedule();
-        // Actualiza el estado de "En Vivo" cada minuto
         setInterval(updateSchedule, 60000);
     </script>
 </body>
