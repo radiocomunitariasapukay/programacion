@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Sapukay - Novedades RSS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        body {
+            background-color: transparent;
+            color: #ffffff;
+            padding: 8px;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        .card {
+            background: rgba(30, 35, 45, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .title-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .station-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ff9800;
+            letter-spacing: 0.5px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            color: #a0aabe;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .feed-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 75vh;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        /* Barra de desplazamiento elegante */
+        .feed-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .feed-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 152, 0, 0.4);
+            border-radius: 10px;
+        }
+
+        .feed-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .feed-item:hover {
+            border-color: rgba(255, 152, 0, 0.4);
+        }
+
+        .feed-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .feed-content {
+            padding: 12px;
+        }
+
+        .item-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .item-description {
+            font-size: 12px;
+            color: #cccccc;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .loading, .error {
+            text-align: center;
+            font-size: 12px;
+            color: #a0aabe;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="header">
+            <div class="title-group">
+                <span>📰</span>
+                <span class="station-name">SAPUKAY 90.9</span>
+            </div>
+            <div class="section-title">NOTICIAS</div>
+        </div>
+
+        <div class="feed-container" id="feed-container">
+            <div class="loading">Cargando publicaciones...</div>
+        </div>
+    </div>
+
+    <script>
+        const rssUrl = "https://rssviewer.app/https%3A%2F%2Frss.app%2Ffeeds%2F_fQ6HxMQcs05FydMJ.xml?utm=rssapp";
+        const apiConverterUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+
+        async function fetchRssFeed() {
+            const container = document.getElementById('feed-container');
+
+            try {
+                const response = await fetch(apiConverterUrl);
+                const data = await response.json();
+
+                if (data.status === 'ok' && data.items && data.items.length > 0) {
+                    container.innerHTML = '';
+
+                    data.items.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'feed-item';
+
+                        // Buscar imagen en la descripción, thumbnail o enclosure
+                        let imageUrl = '';
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = item.description || '';
+                        
+                        const imgTag = tempDiv.querySelector('img');
+                        if (imgTag) {
+                            imageUrl = imgTag.src;
+                            imgTag.remove(); // Removemos la etiqueta img para dejar solo el texto limpio en la descripción
+                        } else if (item.thumbnail) {
+                            imageUrl = item.thumbnail;
+                        } else if (item.enclosure && item.enclosure.link) {
+                            imageUrl = item.enclosure.link;
+                        }
+
+                        const cleanDescription = tempDiv.textContent || tempDiv.innerText || '';
+
+                        let htmlContent = '';
+                        if (imageUrl) {
+                            htmlContent += `<img src="${imageUrl}" class="feed-img" alt="Imagen noticia">`;
+                        }
+
+                        htmlContent += `
+                            <div class="feed-content">
+                                <div class="item-title">${item.title}</div>
+                                ${cleanDescription.trim() ? `<div class="item-description">${cleanDescription}</div>` : ''}
+                            </div>
+                        `;
+
+                        itemDiv.innerHTML = htmlContent;
+                        container.appendChild(itemDiv);
+                    });
+                } else {
+                    container.innerHTML = '<div class="error">No se encontraron publicaciones recientes.</div>';
+                }
+            } catch (err) {
+                console.error("Error al obtener el feed RSS:", err);
+                container.innerHTML = '<div class="error">Error al cargar las noticias.</div>';
+            }
+        }
+
+        fetchRssFeed();
+        // Actualiza el feed automáticamente cada 30 minutos
+        setInterval(fetchRssFeed, 1800000);
+    </script>
+</body>
+</html>
